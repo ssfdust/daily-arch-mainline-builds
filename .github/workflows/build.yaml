@@ -45,7 +45,7 @@ jobs:
         uses: softprops/action-gh-release@v0.1.14
         if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.dev == 'false') }}
         with:
-          name: Arch Linux ${{ env.DATE }}
+          name: Arch Linux with Mainline Kernel ${{ env.DATE }}
           tag_name: ${{ env.DATE }}
           body_path: CHECKSUMS.txt
           files: |
