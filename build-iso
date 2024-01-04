@@ -54,6 +54,15 @@ build() {
   "
   step "Updating packages and installing archiso..." "pacman -Syu --noconfirm archiso"
   step "Copying releng profile to build directory..." "cp -r /usr/share/archiso/configs/releng/* /tmp/isobuild"
+  step "Write Archlinux CN repo header to pacman.conf" "echo '[archlinuxcn]' >> /tmp/isobuild/pacman.conf"
+  step "Write Archlinux CN repo body to pacman.conf" "echo 'Server = https://mirrors.cloud.tencent.com/archlinuxcn/\$arch' >> /tmp/isobuild/pacman.conf"
+  step "Add linux-mainline to installed list" "echo linux-mainline >> /tmp/isobuild/packages.x86_64"
+  step "Set linux-mainline as the default kernel for systemd-boot" "sed -i 's/vmlinuz-linux/vmlinuz-linux-mainline/' /tmp/isobuild/efiboot/loader/entries/*.conf"
+  step "Set linux-mainline as the default kernel initrd for systemd-boot" "sed -i 's/vmlinuz-linux/vmlinuz-linux-mainline/' /tmp/isobuild/efiboot/loader/entries/*.conf"
+  step "Set linux-mainline as the default kernel for syslinux" "sed -i 's/vmlinuz-linux/vmlinuz-linux-mainline/' /tmp/isobuild/syslinux/archiso_sys-linux.cfg"
+  step "Set linux-mainline as the default kernel initrd for syslinux" "sed -i 's/initramfs-linux/initramfs-linux-mainline/' /tmp/isobuild/syslinux/archiso_sys-linux.cfg"
+  step "Set linux-mainline as the default kernel for grub" "sed -i 's/vmlinuz-linux/vmlinuz-linux-mainline/' /tmp/isobuild/grub/*"
+  step "Set linux-mainline as the default kernel initrd for grub" "sed -i 's/initramfs-linux/initramfs-linux-mainline/' /tmp/isobuild/grub/*"
   step "Building ISO..." "mkarchiso -v -w work/ -o ./ /tmp/isobuild"
   step "Generating checksums text file..." "
 		cat <<-EOL >CHECKSUMS.txt
@@ -65,11 +74,21 @@ build() {
   "
 }
 
+prepare () {
+  pacman -Syu archlinux-keyring --noconfirm --needed
+  pacman-key --init
+  pacman-key --lsign-key "farseerfc@archlinux.org"
+  echo "[archlinuxcn]" >> /etc/pacman.conf
+  echo "Server = https://mirrors.cloud.tencent.com/archlinuxcn/\$arch" >> /etc/pacman.conf
+  pacman -Syu archlinuxcn-keyring --noconfirm
+}
+
 main() {
   if [ -z ${DATE+x} ]; then
     echo -e "${RED}DATE variable not set!${RESET}" &&
       exit 1
   else
+    prepare
     build
   fi
 }
