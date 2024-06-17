@@ -58,7 +58,7 @@ build() {
   step "Write Archlinux CN repo body to pacman.conf" "echo 'Server = https://mirrors.bfsu.edu.cn/archlinuxcn/\$arch' >> /tmp/isobuild/pacman.conf"
   step "Add linux-mainline to installed list" "echo linux-mainline >> /tmp/isobuild/packages.x86_64"
   step "Set linux-mainline as the default kernel for systemd-boot" "sed -i 's/vmlinuz-linux/vmlinuz-linux-mainline/' /tmp/isobuild/efiboot/loader/entries/*.conf"
-  step "Set linux-mainline as the default kernel initrd for systemd-boot" "sed -i 's/vmlinuz-linux/vmlinuz-linux-mainline/' /tmp/isobuild/efiboot/loader/entries/*.conf"
+  step "Set linux-mainline as the default kernel initrd for systemd-boot" "sed -i 's/initramfs-linux/initramfs-linux-mainline/' /tmp/isobuild/efiboot/loader/entries/*.conf"
   step "Set linux-mainline as the default kernel for syslinux" "sed -i 's/vmlinuz-linux/vmlinuz-linux-mainline/' /tmp/isobuild/syslinux/archiso_sys-linux.cfg"
   step "Set linux-mainline as the default kernel initrd for syslinux" "sed -i 's/initramfs-linux/initramfs-linux-mainline/' /tmp/isobuild/syslinux/archiso_sys-linux.cfg"
   step "Set linux-mainline as the default kernel for grub" "sed -i 's/vmlinuz-linux/vmlinuz-linux-mainline/' /tmp/isobuild/grub/*"
@@ -79,7 +79,7 @@ prepare () {
   pacman-key --init
   pacman-key --lsign-key "farseerfc@archlinux.org"
   echo "[archlinuxcn]" >> /etc/pacman.conf
-  echo "Server = https://mirrors.cloud.tencent.com/archlinuxcn/\$arch" >> /etc/pacman.conf
+  echo "Server = https://repo.archlinuxcn.org/\$arch" >> /etc/pacman.conf
   pacman -Syu archlinuxcn-keyring --noconfirm
 }
 
